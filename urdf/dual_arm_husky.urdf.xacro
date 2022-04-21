@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
+  <xacro:arg name="is_sim" default="true" />
+
+  <!-- possible 'ur_type' values: ur3, ur3e, ur5, ur5e, ur10, ur10e, ur16e -->
+  <!-- the default value should raise an error in case this was called without defining the type -->
+  <xacro:macro name="ur_robot_sim" params="
+    name
+    prefix
+    parent
+    ur_type:=ur5x">
+
+    <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+
+    <!-- convert to property to use substitution in function -->
+    <xacro:property name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml"/>
+
+    <!-- arm -->
+    <xacro:ur_robot
+      name="${name}"
+      prefix="${prefix}"
+      parent="${parent}"
+      joint_limits_parameters_file="$(find ur_description)/config/${ur_type}/joint_limits.yaml"
+      kinematics_parameters_file="$(find ur_description)/config/${ur_type}/default_kinematics.yaml"
+      physical_parameters_file="$(find ur_description)/config/${ur_type}/physical_parameters.yaml"
+      visual_parameters_file="$(find ur_description)/config/${ur_type}/visual_parameters.yaml"
+      use_fake_hardware="true"
+      fake_sensor_commands="true"
+      sim_gazebo="false"
+      sim_ignition="true"
+      initial_positions="${load_yaml(initial_positions_file)}"
+      script_filename=""
+      output_recipe_filename=""
+      input_recipe_filename=""
+      >
+      <origin xyz="0 0 0" rpy="0 0 0" />          <!-- position robot in the world -->
+    </xacro:ur_robot>
+  </xacro:macro>
+
+  <xacro:include filename="$(find husky_description)/urdf/husky_macro.urdf.xacro" />
+
+  <!-- Load husky description -->
+  <xacro:husky prefix="" />
+
+  <link name="dual_arm_bulkhead_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_ur_description)/meshes/dual_arm_bulkhead.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find husky_ur_description)/meshes/dual_arm_bulkhead_collision.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="left_arm_bulkhead_link" />
+  <joint name="left_arm_bulkhead_joint" type="fixed">
+    <parent link="dual_arm_bulkhead_link" />
+    <child link="left_arm_bulkhead_link" />
+    <origin xyz="0.1225 0.14891 0.13371" rpy="0 -${pi/4} -${pi/2}"/>
+  </joint>
+
+  <link name="right_arm_bulkhead_link" />
+  <joint name="right_arm_bulkhead_joint" type="fixed">
+    <parent link="dual_arm_bulkhead_link" />
+    <child link="right_arm_bulkhead_link" />
+    <origin xyz="0.1225 -0.14891 0.13371" rpy="0 ${pi/4} -${pi/2}"/>
+  </joint>
+
+  <joint name="dual_arm_bulkhead_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="dual_arm_bulkhead_link"/>
+    <origin xyz="0 0 0.224" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:ur_robot_sim name="right_arm" prefix="right_ur_arm_" ur_type="ur5e" parent="right_arm_bulkhead_link"/>
+  <xacro:ur_robot_sim name="left_arm" prefix="left_ur_arm_" ur_type="ur5e" parent="left_arm_bulkhead_link"/>
+
+  <!-- Gazebo plugins -->
+  <gazebo reference="world"/>
+
+  <gazebo>
+      <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+        <robot_param>robot_description</robot_param>
+        <robot_param_node>robot_state_publisher</robot_param_node>
+        <parameters>$(find dual_arm_husky_description)/config/controllers.yaml</parameters>
+      </plugin>
+  </gazebo>
+
+  <!-- <world>
+    <plugin filename="libignition-gazebo-imu-system.so"
+            name="ignition::gazebo::systems::Imu"/>
+  </world>
+
+  <sensor name="imu_sensor" type="imu">
+      <always_on>1</always_on>
+      <update_rate>1</update_rate>
+      <visualize>true</visualize>
+      <topic>imu/data</topic>
+  </sensor>
+
+  <sensor name="imu_sensor" type="gps">
+      <always_on>1</always_on>
+      <update_rate>1</update_rate>
+      <visualize>true</visualize>
+      <topic>navstat/fix</topic>
+  </sensor> -->
+
+</robot>
