@@ -1,0 +1,15 @@
+# Taken from https://github.com/husky/husky_manipulation/blob/melodic-devel/husky_dual_ur_moveit_config/config/husky.srdf
+shoulder_pan_joint: 1.5707
+shoulder_lift_joint: -2.6473
+elbow_joint: 2.6473
+wrist_1_joint: 3.1415
+wrist_2_joint: -1.5707
+wrist_3_joint: 0.0
+
+# Taken from https://github.com/husky/husky_manipulation/blob/noetic-devel/husky_dual_ur_moveit_config/config/husky.srdf
+# shoulder_pan_joint: 0
+# shoulder_lift_joint: -2.6473
+# elbow_joint: 2.643
+# wrist_1_joint: -1.5707
+# wrist_2_joint: -1.5707
+# wrist_3_joint: 0.0

@@ -13,7 +13,7 @@
     <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
 
     <!-- convert to property to use substitution in function -->
-    <xacro:property name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml"/>
+    <xacro:property name="initial_positions_file" default="$(find dual_arm_husky_description)/config/${prefix}initial_positions.yaml"/>
 
     <!-- arm -->
     <xacro:ur_robot
@@ -24,8 +24,8 @@
       kinematics_parameters_file="$(find ur_description)/config/${ur_type}/default_kinematics.yaml"
       physical_parameters_file="$(find ur_description)/config/${ur_type}/physical_parameters.yaml"
       visual_parameters_file="$(find ur_description)/config/${ur_type}/visual_parameters.yaml"
-      use_fake_hardware="true"
-      fake_sensor_commands="true"
+      use_fake_hardware="false"
+      fake_sensor_commands="false"
       sim_gazebo="false"
       sim_ignition="true"
       initial_positions="${load_yaml(initial_positions_file)}"
@@ -84,11 +84,11 @@
   <gazebo reference="world"/>
 
   <gazebo>
-      <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
-        <robot_param>robot_description</robot_param>
-        <robot_param_node>robot_state_publisher</robot_param_node>
-        <parameters>$(find dual_arm_husky_description)/config/controllers.yaml</parameters>
-      </plugin>
+    <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
+      <parameters>$(find dual_arm_husky_description)/config/controllers.yaml</parameters>
+    </plugin>
   </gazebo>
 
   <!-- <world>
