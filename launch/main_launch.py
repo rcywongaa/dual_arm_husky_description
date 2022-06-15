@@ -119,21 +119,6 @@ def generate_launch_description():
         ],
     )
 
-    # controller_configs = PathJoinSubstitution(
-    #     [FindPackageShare("dual_arm_husky_description"),
-    #     "config",
-    #     "controllers.yaml"],
-    # )
-    # node_controller_manager = Node(
-    #     package="controller_manager",
-    #     executable="ros2_control_node",
-    #     parameters=[robot_description, controller_configs],
-    #     output={
-    #         "stdout": "screen",
-    #         "stderr": "screen",
-    #     },
-    # )
-
     # Bridge /clock
     start_bridge = Node(
         package="ros_ign_bridge",
@@ -216,37 +201,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # RViz
-    # tutorial_mode = LaunchConfiguration("rviz_tutorial")
-    # rviz_base = os.path.join(get_package_share_directory("moveit2_tutorials"), "launch")
-    # rviz_full_config = os.path.join(rviz_base, "panda_moveit_config_demo.rviz")
-    # rviz_empty_config = os.path.join(rviz_base, "panda_moveit_config_demo_empty.rviz")
-    # rviz_node_tutorial = Node(
-    #     package="rviz2",
-    #     executable="rviz2",
-    #     name="rviz2",
-    #     output="log",
-    #     arguments=["-d", rviz_empty_config],
-    #     parameters=[
-    #         robot_description,
-    #         robot_description_semantic,
-    #         ompl_planning_pipeline_config,
-    #         kinematics_yaml,
-    #     ],
-    # )
-    # rviz_node = Node(
-    #     package="rviz2",
-    #     executable="rviz2",
-    #     name="rviz2",
-    #     output="log",
-    #     arguments=["-d", rviz_full_config],
-    #     parameters=[
-    #         robot_description,
-    #         robot_description_semantic,
-    #         ompl_planning_pipeline_config,
-    #         kinematics_yaml,
-    #     ],
-    # )
 
     # Static TF
     static_tf = Node(
