@@ -12,13 +12,13 @@
 
   <depend>rclpy</depend>
   <depend>ros_ign_gazebo</depend>
-  <depend>rclpy_message_converter</depend>
   <depend>ros_ign_bridge</depend>
 
 
   <!-- Debug tools -->
   <depend>rqt_publisher</depend>
   <depend>rqt_action</depend>
+  <depend>rclpy_message_converter</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
