@@ -216,6 +216,7 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2",
         output="log",
+        arguments=["-d", os.path.join(get_package_share_directory("dual_arm_husky_description"), "rviz/default.rviz")],
         parameters=[
             robot_description,
             robot_description_semantic,

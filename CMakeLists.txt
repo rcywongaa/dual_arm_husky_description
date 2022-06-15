@@ -11,7 +11,7 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
 
 install(
-  DIRECTORY launch urdf config
+  DIRECTORY launch urdf config rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
