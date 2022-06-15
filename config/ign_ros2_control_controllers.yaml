@@ -29,6 +29,9 @@ controller_manager:
     # forward_position_controller:
     #   type: position_controllers/JointGroupPositionController
 
+    left_arm_base_joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
 husky_velocity_controller:
   ros__parameters:
     left_wheel_names: [ "front_left_wheel_joint", "rear_left_wheel_joint" ]
@@ -178,3 +181,19 @@ right_arm_joint_trajectory_controller:
 #       - wrist_2_joint
 #       - wrist_3_joint
 
+left_arm_base_joint_trajectory_controller:
+  ros__parameters:
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_partial_joints_goal: true
+    joints:
+      - left_ur_arm_shoulder_pan_joint
+      - left_ur_arm_shoulder_lift_joint
+      - left_ur_arm_elbow_joint
+      - left_ur_arm_wrist_1_joint
+      - left_ur_arm_wrist_2_joint
+      - left_ur_arm_wrist_3_joint
+      - position

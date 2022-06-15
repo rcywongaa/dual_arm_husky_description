@@ -87,7 +87,7 @@
     <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
       <robot_param>robot_description</robot_param>
       <robot_param_node>robot_state_publisher</robot_param_node>
-      <parameters>$(find dual_arm_husky_description)/config/controllers.yaml</parameters>
+      <parameters>$(find dual_arm_husky_description)/config/ign_ros2_control_controllers.yaml</parameters>
     </plugin>
   </gazebo>
 
