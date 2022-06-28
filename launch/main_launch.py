@@ -2,11 +2,9 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler, SetEnvironmentVariable
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import xacro
@@ -18,6 +16,7 @@ ARGUMENTS = [
                           description='The world path, by default is empty.world'),
 ]
 
+
 def load_file(package_name, file_path):
     package_path = get_package_share_directory(package_name)
     absolute_file_path = os.path.join(package_path, file_path)
@@ -27,6 +26,7 @@ def load_file(package_name, file_path):
             return file.read()
     except EnvironmentError:  # parent of IOError, OSError *and* WindowsError where available
         return None
+
 
 def load_yaml(package_name, file_path):
     package_path = get_package_share_directory(package_name)
@@ -38,9 +38,10 @@ def load_yaml(package_name, file_path):
     except EnvironmentError:  # parent of IOError, OSError *and* WindowsError where available
         return None
 
+
 def generate_launch_description():
     # Disable top plate
-    os.environ['HUSKY_TOP_PLATE_ENABLED']='false'
+    os.environ['HUSKY_TOP_PLATE_ENABLED'] = 'false'
     # Get URDF via xacro
     robot_description_content = xacro.process_file(
         os.path.join(
@@ -58,7 +59,8 @@ def generate_launch_description():
         "husky_dual_ur_moveit_config",
         "config/husky.srdf"
     )
-    robot_description_semantic = {"robot_description_semantic": robot_description_semantic_content}
+    robot_description_semantic = {
+        "robot_description_semantic": robot_description_semantic_content}
 
     kinematics_yaml = load_yaml(
         "husky_dual_ur_moveit_config", "config/kinematics.yaml"
@@ -99,7 +101,8 @@ def generate_launch_description():
         "publish_transforms_updates": True,
     }
 
-    joint_limits_yaml = {'robot_description_planning': load_yaml('husky_dual_ur_moveit_config', 'config/joint_limits.yaml')}
+    joint_limits_yaml = {'robot_description_planning': load_yaml(
+        'husky_dual_ur_moveit_config', 'config/joint_limits.yaml')}
 
     # Start the actual move_group node/action server
     run_move_group_node = Node(
@@ -150,10 +153,10 @@ def generate_launch_description():
         executable='create',
         name='spawn_robot',
         arguments=['-topic', 'robot_description',
-          '-z', '0.15',
-          '-J', 'left_ur_arm_shoulder_pan_joint', '-1.5707',
-          '-J', 'left_ur_arm_shoulder_lift_joint', '-0.4942',
-          '-unpause'],
+                   '-z', '0.15',
+                   '-J', 'left_ur_arm_shoulder_pan_joint', '-1.5707',
+                   '-J', 'left_ur_arm_shoulder_lift_joint', '-0.4942',
+                   '-unpause'],
         output='screen',
     )
 
@@ -190,14 +193,16 @@ def generate_launch_description():
     spawn_left_arm_joint_trajectory_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['left_arm_joint_trajectory_controller', '-c', '/controller_manager'],
+        arguments=['left_arm_joint_trajectory_controller',
+                   '-c', '/controller_manager'],
         output='screen',
     )
 
     spawn_right_arm_joint_trajectory_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['right_arm_joint_trajectory_controller', '-c', '/controller_manager'],
+        arguments=['right_arm_joint_trajectory_controller',
+                   '-c', '/controller_manager'],
         output='screen',
     )
 
@@ -208,15 +213,20 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
+        arguments=["0.0", "0.0", "0.0", "0.0",
+                   "0.0", "0.0", "world", "base_link"],
     )
 
+    # When launching with gdb, the planning interactive marker may not appear
+    # due to  MoveIt not being fully up when rviz is launched.
+    # Simply restart (or duplicate) the rviz MoveIt plugin to get back the interactive marker
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
         output="log",
-        arguments=["-d", os.path.join(get_package_share_directory("dual_arm_husky_description"), "rviz/default.rviz")],
+        arguments=["-d", os.path.join(get_package_share_directory(
+            "dual_arm_husky_description"), "rviz/default.rviz")],
         parameters=[
             robot_description,
             robot_description_semantic,
