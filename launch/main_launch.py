@@ -101,8 +101,10 @@ def generate_launch_description():
         "publish_transforms_updates": True,
     }
 
-    joint_limits_yaml = {'robot_description_planning': load_yaml(
-        'husky_dual_ur_moveit_config', 'config/joint_limits.yaml')}
+    joint_limits_yaml = {
+        'robot_description_planning':
+        load_yaml('husky_dual_ur_moveit_config', 'config/joint_limits.yaml')
+    }
 
     # Start the actual move_group node/action server
     run_move_group_node = Node(
@@ -120,7 +122,7 @@ def generate_launch_description():
             planning_scene_monitor_parameters,
             {"use_sim_time": True},
         ],
-        prefix="gdbserver localhost:3000"
+        #prefix="gdbserver localhost:3000"
     )
 
     # Bridge /clock
@@ -129,8 +131,7 @@ def generate_launch_description():
         executable="parameter_bridge",
         name="clock_bridge",
         output="screen",
-        arguments=['/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock']
-    )
+        arguments=['/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock'])
 
     node_robot_state_publisher = Node(
         package="robot_state_publisher",
@@ -155,8 +156,6 @@ def generate_launch_description():
         name='spawn_robot',
         arguments=['-topic', 'robot_description',
                    '-z', '0.15',
-                   '-J', 'left_ur_arm_shoulder_pan_joint', '-1.5707',
-                   '-J', 'left_ur_arm_shoulder_lift_joint', '-0.4942',
                    '-unpause'],
         output='screen',
     )
@@ -169,13 +168,6 @@ def generate_launch_description():
         # parameters=[{"use_sim_time": True}]
     )
 
-    # spawn_joint_state_broadcaster_after_gazebo = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=spawn_robot,
-    #         on_exit=[spawn_joint_state_broadcaster]
-    #     )
-    # )
-
     spawn_husky_velocity_controller = Node(
         package='controller_manager',
         executable='spawner',
@@ -183,30 +175,44 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Make sure spawn_husky_velocity_controller starts after spawn_joint_state_broadcaster
-    spawn_husky_controller_after_joint_state_broadcaster = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=spawn_joint_state_broadcaster,
-            on_exit=[spawn_husky_velocity_controller],
-        )
-    )
-
     spawn_left_arm_joint_trajectory_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['left_arm_joint_trajectory_controller',
-                   '-c', '/controller_manager'],
+        arguments=[
+            'left_arm_joint_trajectory_controller', '-c', '/controller_manager'
+        ],
         output='screen',
     )
 
     spawn_right_arm_joint_trajectory_controller = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['right_arm_joint_trajectory_controller',
-                   '-c', '/controller_manager'],
+        arguments=[
+            'right_arm_joint_trajectory_controller', '-c',
+            '/controller_manager'
+        ],
         output='screen',
     )
 
+    spawn_left_arm_base_joint_trajectory_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=[
+            'left_arm_base_joint_trajectory_controller', '-c',
+            '/controller_manager'
+        ],
+        output='screen',
+    )
+
+    spawn_right_arm_base_joint_trajectory_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=[
+            'right_arm_base_joint_trajectory_controller', '-c',
+            '/controller_manager'
+        ],
+        output='screen',
+    )
 
     # Static TF
     static_tf = Node(
@@ -214,8 +220,9 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0",
-                   "0.0", "0.0", "world", "base_link"],
+        arguments=[
+            "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"
+        ],
     )
 
     # When launching with gdb, the planning interactive marker may not appear
@@ -226,8 +233,13 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2",
         output="log",
-        arguments=["-d", os.path.join(get_package_share_directory(
-            "dual_arm_husky_description"), "rviz/default.rviz")],
+        arguments=[
+            "-d",
+            os.path.join(
+                get_package_share_directory("dual_arm_husky_description"),
+                "rviz/default.rviz"),
+            # '--ros-args', '--log-level', 'DEBUG'
+        ],
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -235,18 +247,33 @@ def generate_launch_description():
             kinematics_yaml,
             {"use_sim_time": True},
         ],
+        # prefix="gdbserver localhost:3000"
     )
 
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(node_robot_state_publisher)
-    # ld.add_action(node_controller_manager)
     ld.add_action(ign_gazebo)
     ld.add_action(spawn_robot)
-    ld.add_action(spawn_joint_state_broadcaster)
-    ld.add_action(spawn_husky_controller_after_joint_state_broadcaster)
-    ld.add_action(spawn_left_arm_joint_trajectory_controller)
-    ld.add_action(spawn_right_arm_joint_trajectory_controller)
-    ld.add_action(run_move_group_node)
+    # ld.add_action(spawn_joint_state_broadcaster)
+    ld.add_action(RegisterEventHandler(
+        event_handler=OnProcessExit(target_action=spawn_robot,
+                                    on_exit=[spawn_joint_state_broadcaster])))
+    ld.add_action(
+        RegisterEventHandler(event_handler=OnProcessExit(
+            target_action=spawn_joint_state_broadcaster,
+            on_exit=[
+                spawn_husky_velocity_controller,
+                spawn_left_arm_joint_trajectory_controller, # Will have resource conflict if spawned with left_arm_base_joint_trajectory_controller
+                # spawn_left_arm_base_joint_trajectory_controller, # husky position to velocity controller not implemented yet
+                spawn_right_arm_joint_trajectory_controller
+                # spawn_right_arm_base_joint_trajectory_controller # husky position to velocity controller not implemented yet
+            ],
+        )))
+    ld.add_action(
+        RegisterEventHandler(event_handler=OnProcessExit(
+            target_action=spawn_robot,
+            on_exit=[run_move_group_node]
+        )))
     ld.add_action(start_bridge)
     ld.add_action(rviz_node)
     ld.add_action(static_tf)
