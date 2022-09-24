@@ -63,7 +63,7 @@ def generate_launch_description():
         "robot_description_semantic": robot_description_semantic_content}
 
     kinematics_yaml = load_yaml(
-        "husky_dual_ur_moveit_config", "config/kinematics.yaml"
+        "dual_arm_husky_description", "config/kinematics.yaml"
     )
 
     # Planning Functionality
@@ -74,9 +74,8 @@ def generate_launch_description():
             "start_state_max_bounds_error": 0.1,
         }
     }
-    ompl_planning_yaml = load_yaml(
-        "husky_dual_ur_moveit_config", "config/ompl_planning.yaml"
-    )
+    ompl_planning_yaml = load_yaml("dual_arm_husky_description",
+                                   "config/ompl_planning.yaml")
     ompl_planning_pipeline_config["move_group"].update(ompl_planning_yaml)
 
     trajectory_execution = {
@@ -88,8 +87,7 @@ def generate_launch_description():
 
     # Trajectory Execution Functionality
     moveit_simple_controllers_yaml = load_yaml(
-        "husky_dual_ur_moveit_config", "config/moveit_controllers.yaml"
-    )
+        "dual_arm_husky_description", "config/moveit_controllers.yaml")
     moveit_controllers = {
         "moveit_simple_controller_manager": moveit_simple_controllers_yaml,
         "moveit_controller_manager": "moveit_simple_controller_manager/MoveItSimpleControllerManager",

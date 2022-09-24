@@ -1,0 +1,61 @@
+trajectory_execution:
+  allowed_execution_duration_scaling: 1.2
+  allowed_goal_duration_margin: 0.5
+  allowed_start_tolerance: 0.01
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+controller_names:
+  - left_arm_joint_trajectory_controller
+  - right_arm_joint_trajectory_controller
+  - left_arm_base_joint_trajectory_controller
+  - right_arm_base_joint_trajectory_controller
+
+left_arm_joint_trajectory_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+    - left_ur_arm_shoulder_pan_joint
+    - left_ur_arm_shoulder_lift_joint
+    - left_ur_arm_elbow_joint
+    - left_ur_arm_wrist_1_joint
+    - left_ur_arm_wrist_2_joint
+    - left_ur_arm_wrist_3_joint
+
+right_arm_joint_trajectory_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+    - right_ur_arm_shoulder_pan_joint
+    - right_ur_arm_shoulder_lift_joint
+    - right_ur_arm_elbow_joint
+    - right_ur_arm_wrist_1_joint
+    - right_ur_arm_wrist_2_joint
+    - right_ur_arm_wrist_3_joint
+
+left_arm_base_joint_trajectory_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+    - left_ur_arm_shoulder_pan_joint
+    - left_ur_arm_shoulder_lift_joint
+    - left_ur_arm_elbow_joint
+    - left_ur_arm_wrist_1_joint
+    - left_ur_arm_wrist_2_joint
+    - left_ur_arm_wrist_3_joint
+    - position
+
+right_arm_base_joint_trajectory_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+    - right_ur_arm_shoulder_pan_joint
+    - right_ur_arm_shoulder_lift_joint
+    - right_ur_arm_elbow_joint
+    - right_ur_arm_wrist_1_joint
+    - right_ur_arm_wrist_2_joint
+    - right_ur_arm_wrist_3_joint
+    - position
